@@ -7,31 +7,75 @@
 // Example: 5! = 5 x 4 x 3 x 2 x 1 = 120
 // factorial(5); // 120
 var factorial = function(n) {
+  if (n === 0) {
+    return 1;
+  } else if (n < 0) {
+    return null;
+  }
+  return n * factorial(n - 1);
 };
 
 // 2. Compute the sum of an array of integers.
 // sum([1,2,3,4,5,6]); // 21
 var sum = function(array) {
+  if (array.length === 0) {
+    return 0
+  }
+  return array[0] + sum(array.slice(1));
 };
 
 // 3. Sum all numbers in an array containing nested arrays.
 // arraySum([1,[2,3],[[4]],5]); // 15
 var arraySum = function(array) {
+  return array.reduce(function(sum, element) {
+    if (!Array.isArray(element)) {
+      sum += element;
+
+    } else {
+      sum += arraySum(element);
+    }
+    return sum;
+  }, 0)
 };
 
-// 4. Check if a number is even.
+// 4. Check if a number is even. should not use modulo
 var isEven = function(n) {
+  var positiveN = Math.abs(n);
+  if (positiveN === 1) {
+    return false;
+  } else if (positiveN === 2 || positiveN === 0) {
+    return true;
+  } else {
+    return isEven(positiveN - 2)
+  }
 };
 
 // 5. Sum all integers below a given integer.
 // sumBelow(10); // 45
-// sumBelow(7); // 21
+// sumBelow(-7); // -21
 var sumBelow = function(n) {
+  if (n === 0 || n === 1) {
+    return 0
+  } else if (n < 0) {
+    return -sumBelow(-n);
+  } else {
+    return n - 1 + sumBelow(n - 1)
+  }
 };
 
 // 6. Get the integers within a range (x, y).
 // range(2,9); // [3,4,5,6,7,8]
 var range = function(x, y) {
+  if (x > y) {
+    [x, y] = [y, x]
+    return range(x, y).reverse();
+  }
+
+  if (y === x || y === x + 1) {
+    return []
+  }
+
+  return [x + 1].concat(range(x + 1, y))
 };
 
 // 7. Compute the exponent of a number.
@@ -40,6 +84,16 @@ var range = function(x, y) {
 // exponent(4,3); // 64
 // https://www.khanacademy.org/computing/computer-science/algorithms/recursive-algorithms/a/computing-powers-of-a-number
 var exponent = function(base, exp) {
+  if (exp === 0) {
+    return 1;
+  } else if (exp < 0) {
+    return 1 / exponent(base, -1 * exp);
+  } else if (exp % 2 === 0) {
+    var y = exponent(base, exp / 2)
+    return y * y;
+  } else {
+    return base * exponent(base, exp - 1);
+  }
 };
 
 // 8. Determine if a number is a power of two.
@@ -47,10 +101,20 @@ var exponent = function(base, exp) {
 // powerOfTwo(16); // true
 // powerOfTwo(10); // false
 var powerOfTwo = function(n) {
+  if (n === 0 || n < 0) {
+    return false;
+  } else if (n === 1) {
+    return true;
+  } else if (n % 2 === 0) {
+    return powerOfTwo(n / 2)
+  } else {
+    return false;
+  }
 };
 
 // 9. Write a function that reverses a string.
 var reverse = function(string) {
+
 };
 
 // 10. Write a function that determines if a string is a palindrome.
@@ -111,6 +175,7 @@ var buildList = function(value, length) {
 // For numbers which are multiples of both three and five, output “FizzBuzz” instead of the number.
 // fizzBuzz(5) // ['1','2','Fizz','4','Buzz']
 var fizzBuzz = function(n) {
+
 };
 
 // 20. Count the occurrence of a value in a list.
@@ -136,11 +201,31 @@ var countKeysInObj = function(obj, key) {
 // countValuesInObj(obj, 'r') // 2
 // countValuesInObj(obj, 'e') // 1
 var countValuesInObj = function(obj, value) {
+  var objValue = Object.values(obj);
+  return objValue.reduce(function(count, element){
+    if (element === value) {
+      count ++;
+    } else if (typeof element === 'object' ) {
+      return count + countValuesInObj(element, value);
+    }
+    return count;
+  }, 0)
 };
 
 // 24. Find all keys in an object (and nested objects) by a provided name and rename
 // them to a provided new name while preserving the value stored at that key.
 var replaceKeysInObj = function(obj, oldKey, newKey) {
+  for (var key in obj) {
+    if (typeof obj[key] === 'object') {
+      replaceKeysInObj(obj[key], oldKey, newKey);
+    }
+
+    if (key === oldKey) {
+      obj[key] = obj[newKey];
+      delete obj[key];
+    }
+  }
+  return obj;
 };
 
 // 25. Get the first n Fibonacci numbers. In the Fibonacci sequence, each subsequent
@@ -149,6 +234,14 @@ var replaceKeysInObj = function(obj, oldKey, newKey) {
 // fibonacci(5); // [0,1,1,2,3,5]
 // Note: The 0 is not counted.
 var fibonacci = function(n) {
+  if (n <= 0) {
+    return null;
+  } else if (n === 1) {
+    return [0, 1];
+  } else {
+    var y = fibonacci(n - 1)
+    return y.concat(y[n - 1] + y [n - 2]);
+  }
 };
 
 // 26. Return the Fibonacci number located at index n of the Fibonacci sequence.
@@ -157,6 +250,15 @@ var fibonacci = function(n) {
 // nthFibo(7); // 13
 // nthFibo(3); // 2
 var nthFibo = function(n) {
+  if (n < 0) {
+    return null;
+  } else if (n === 0) {
+    return 0;
+  } else if (n === 1) {
+    return 1;
+  } else {
+    return nthFibo(n - 1) + nthFibo(n - 2);
+  }
 };
 
 // 27. Given an array of words, return a new array containing each word capitalized.
