@@ -114,29 +114,89 @@ var powerOfTwo = function(n) {
 
 // 9. Write a function that reverses a string.
 var reverse = function(string) {
-
+  if (string.length === 0) {
+    return "";
+  }
+  return string[string.length - 1].concat(reverse(string.slice(0, string.length - 1)));
 };
 
 // 10. Write a function that determines if a string is a palindrome.
 var palindrome = function(string) {
+  var halfLength = Math.floor(string.length / 2);
+  if (halfLength === 0) {
+    return true;
+  } else if (string[0].toLowerCase() === string[string.length - 1].toLowerCase()) {
+    return palindrome(string.slice(1, string.length - 1));
+  } else {
+    return false;
+  }
 };
 
 // 11. Write a function that returns the remainder of x divided by y without using the
-// modulo (%) operator.
+// modulo (%) operator. No *, /, Math
 // modulo(5,2) // 1
 // modulo(17,5) // 2
 // modulo(22,6) // 4
 var modulo = function(x, y) {
+  if (y === 0) {
+    return NaN;
+  }
+
+  if (x === 0) {
+    return 0;
+  }
+
+  if (x > 0 && y > 0) {
+    if (x > y) {
+      return modulo(x - y, y)
+    } else if (y > x) {
+      return x;
+    } else {
+      return 0;
+    }
+  } else if (x > 0 && y < 0) {
+    if (x + y > 0) {
+      return modulo(x + y, y)
+    } else if (x + y < 0) {
+      return x;
+    } else {
+      return 0;
+    }
+  } else if (x < 0 && y > 0) {
+    if (x + y < 0) {
+      return modulo(x + y, y)
+    } else if (x + y > 0) {
+      return x;
+    } else {
+      return 0;
+    }
+  } else {
+    if (x - y < 0) {
+      return modulo(x - y, y)
+    } else if (x - y > 0) {
+      return x;
+    } else {
+      return 0;
+    }
+  }
 };
 
 // 12. Write a function that multiplies two numbers without using the * operator or
 // Math methods.
 var multiply = function(x, y) {
+  if (y === 0 || x === 0) {
+    return 0;
+  } else if (y > 0) {
+    return x + multiply(x, y - 1);
+  } else if (y < 0) {
+    return multiply(x, y + 1) - x;
+  }
 };
 
 // 13. Write a function that divides two numbers without using the / operator or
 // Math methods to arrive at an approximate quotient (ignore decimal endings).
 var divide = function(x, y) {
+
 };
 
 // 14. Find the greatest common divisor (gcd) of two positive numbers. The GCD of two
@@ -215,16 +275,17 @@ var countValuesInObj = function(obj, value) {
 // 24. Find all keys in an object (and nested objects) by a provided name and rename
 // them to a provided new name while preserving the value stored at that key.
 var replaceKeysInObj = function(obj, oldKey, newKey) {
-  for (var key in obj) {
+  var objKeys = Object.keys(obj);
+  objKeys.forEach(function(key){
     if (typeof obj[key] === 'object') {
       replaceKeysInObj(obj[key], oldKey, newKey);
     }
 
     if (key === oldKey) {
-      obj[key] = obj[newKey];
+      obj[newKey] = obj[key];
       delete obj[key];
     }
-  }
+  })
   return obj;
 };
 
