@@ -550,15 +550,13 @@ var minimizeZeroes = function(array) {
     return array[0];
   }
   var result = [];
-  var lastValueisO = false;
   if (array[0] !== 0) {
-    lastValueisO = false;
     result.push(array[0]);
-  } else if (lastValueisO === false && array[0] === 0){
-    lastValueisO = true;
-    result.push(array[0]);
+  } else if (array[0] === 0 && (array[1] !== 0 || 1 >= array.length)) {
+    result.push(array[0])
   }
-  return result.concat(minimizeZeroes(array.slice(1)));
+  result = result.concat(minimizeZeroes(array.slice(1)))
+  return result;
 };
 
 // 35. Alternate the numbers in an array between positive and negative regardless of
@@ -583,7 +581,19 @@ var alternateSign = function(array) {
 // numToText("I have 5 dogs and 6 ponies"); // "I have five dogs and six ponies"
 var numToText = function(str) {
   var numDic = {'1': 'one', '2': 'two', '3': 'three', '4': 'four', '5': 'five', '6': 'six', '7':'seven', '8': 'eight', '9': 'nine', '10': 'ten'};
+  var arr = str.split(" ");
+  var returnArr = [];
+  if (arr[0] in numDic) {
+    returnArr.push(numDic[arr[0]]);
+  } else {
+    returnArr.push(arr[0]);
+  }
 
+  if (arr.length > 1) {
+    returnArr = returnArr.concat(numToText(arr.slice(1).join(" ")));
+  }
+
+  return returnArr.join(" ");
 };
 
 
@@ -591,25 +601,112 @@ var numToText = function(str) {
 
 // 37. Return the number of times a tag occurs in the DOM.
 var tagCount = function(tag, node) {
+  var node = node || document.body;
+  var count = 0;
+
+  if (node.localName === tag) {
+    count ++;
+  }
+
+  if (node.childNodes.length > 0) {
+    for (var i = 0; i < node.childNodes.length; i ++) {
+      count += tagCount(tag, node.childNodes[i]);
+    }
+  }
+  return count;
 };
 
 // 38. Write a function for binary search.
 // var array = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
 // binarySearch(array, 5) // 5
+// input1 = [1,2,3,4,5,6];
+// input2 = [1,2,3,4,5,6,7];
+// input3 = [-5,-4,-3,-2,-1];
+// input4 = [-6,-5,-4,-3,-2,-1];
+// input5 = [-4,-3,-2,-1,0,1,2,3];
+// primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43];
 // https://www.khanacademy.org/computing/computer-science/algorithms/binary-search/a/binary-search
-var binarySearch = function(array, target, min, max) {
+var binarySearch = function(array, target, min = 0, max = array.length - 1) {
+  var middleIndex = Math.floor((min + max) / 2);
+  if (min > max) {
+    return null;
+  }
+
+  if (array[middleIndex] > target) {
+    return binarySearch(array, target, min, middleIndex - 1);
+  } else if (array[middleIndex] < target) {
+    return binarySearch(array, target, middleIndex + 1, max);
+  } else {
+    return middleIndex;
+  }
 };
 
 // 39. Write a merge sort function.
-// mergeSort([34,7,23,32,5,62]) // [5,7,23,32,34,62]
+// mergeSort([34,7,23,32,5,62]) // [5,7,23,32,34,62]'
+// [34,7,23] [32,5,62]
+// [34], [7], [23], [32], [5], [62]
+// [7, 23, 34], [5, 32, 62]
+// [5, 7, 23, 32, 34, 62]
 // https://www.khanacademy.org/computing/computer-science/algorithms/merge-sort/a/divide-and-conquer-algorithms
 var mergeSort = function(array) {
+  // divide
+  if (array.length <= 1) {
+    return array;
+  } else {
+    var middle = Math.floor((array.length - 1) / 2)
+    var leftArr = array.slice(0, middle + 1);
+    var rightArr = array.slice(middle + 1);
+
+    return merge(mergeSort(leftArr), mergeSort(rightArr));
+  }
 };
+
+function merge(arr1, arr2) {
+  var outputArray = [];
+
+  if (arr1.length > 0 && arr2.length > 0) {
+    if (arr1[0] > arr2[0]) {
+      outputArray.push(arr2[0]);
+      return outputArray.concat(merge(arr1, arr2.slice(1)));
+    } else {
+      outputArray.push(arr1[0]);
+      return outputArray.concat(merge(arr1.slice(1), arr2));
+    }
+  } else if (arr1.length > 0 && arr2.length === 0) {
+    return outputArray.concat(arr1);
+  } else if (arr1.length === 0 && arr2.length > 0) {
+    return outputArray.concat(arr2);
+  }
+  return outputArray;
+}
 
 // 40. Deeply clone objects and arrays.
 // var obj1 = {a:1,b:{bb:{bbb:2}},c:3};
 // var obj2 = clone(obj1);
 // console.log(obj2); // {a:1,b:{bb:{bbb:2}},c:3}
 // obj1 === obj2 // false
+// array1 = [1,[2,[]],3,[[[4]],5]];
+// array2 = [1,[2,{a:[{},2,3]}],{3:[4]},5];
 var clone = function(input) {
+  if (Array.isArray(input)) {
+    var cloneObj = input.reduce(function(copy, element) {
+      if (typeof element === 'object') {
+        copy.push(clone(element));
+      } else {
+        copy.push(element)
+      }
+      return copy;
+    }, [])
+    return cloneObj
+  } else if (typeof input === 'object') {
+    var cloneObj = {};
+    for (var key in input) {
+      if (typeof input[key] === 'object') {
+        cloneObj[key] = clone(input[key]);
+      } else {
+        cloneObj[key] = input[key];
+      }
+    }
+    return cloneObj;
+  }
 };
